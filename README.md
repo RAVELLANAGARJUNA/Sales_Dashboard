@@ -36,7 +36,7 @@ The goal of this project is to analyze historical sales data, uncover business i
 I'm **R. Nagarjuna**, a passionate Data Analyst skilled in Python, SQL, Excel, and Power BI.  
 📩 Email: arjunravella108@gmail.com  
 📱 Phone: 7095740732  
-🔗 [LinkedIn](https://www.linkedin.com/in/Nagarjuna )
+🔗 [LinkedIn](https://www.linkedin.com/in/R-Nagarjuna )
 
 ## 📷 Dashboard Preview
 
