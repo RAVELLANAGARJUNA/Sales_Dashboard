@@ -29,7 +29,7 @@ The goal of this project is to analyze historical sales data, uncover business i
 
 ## 🔗 GitHub Link
 
-> [👉 View Project on GitHub](https://github.com/RAVELLANAGARUNA/Sales-Dashboard)
+> [👉 View Project on GitHub](https://github.com/RAVELLANAGARUNA/Sales_Dashboard)
 
 ## 🙋 About Me
 
