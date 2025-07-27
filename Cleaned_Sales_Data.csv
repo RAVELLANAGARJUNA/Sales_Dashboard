@@ -1,0 +1,736 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "2b5313e1-0fea-4faf-a9a5-d19ce3abae3d",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "      OrderID  OrderDate CustomerID     CustomerName   Region      Segment  \\\n",
+      "0     ORD1000 2022-01-01    CUST802      Adam Austin     East    Corporate   \n",
+      "1     ORD1001 2022-01-02    CUST905     Jeremy Crane    South  Home Office   \n",
+      "2     ORD1002 2022-01-03    CUST960  Robert Friedman     East     Consumer   \n",
+      "3     ORD1003 2022-01-04    CUST558    Julia Stewart     East    Corporate   \n",
+      "4     ORD1004 2022-01-05    CUST642     Brian Butler     East  Home Office   \n",
+      "...       ...        ...        ...              ...      ...          ...   \n",
+      "4995  ORD5995 2035-09-05    CUST276     Steven Perry    South     Consumer   \n",
+      "4996  ORD5996 2035-09-06    CUST524      Robin Smith  Central  Home Office   \n",
+      "4997  ORD5997 2035-09-07    CUST400    Amy Hernandez     East    Corporate   \n",
+      "4998  ORD5998 2035-09-08    CUST872      Anita Smith    South  Home Office   \n",
+      "4999  ORD5999 2035-09-09    CUST669  Angela Gonzalez     East    Corporate   \n",
+      "\n",
+      "      ProductCategory ProductName   Sales  Quantity  Discount  Profit  \\\n",
+      "0           Furniture         Old  387.05         3      0.02  211.19   \n",
+      "1     Office Supplies   Education  951.70         8      0.17   26.66   \n",
+      "2     Office Supplies      Forget  737.35         7      0.09  -24.84   \n",
+      "3          Technology  Themselves  606.69         3      0.32  200.49   \n",
+      "4     Office Supplies       Break  172.90         6      0.23   86.75   \n",
+      "...               ...         ...     ...       ...       ...     ...   \n",
+      "4995        Furniture     Article  899.45         4      0.02  290.15   \n",
+      "4996       Technology        Safe  136.99         5      0.42   12.57   \n",
+      "4997  Office Supplies    Probably  341.29         8      0.10  128.92   \n",
+      "4998        Furniture     Imagine  819.43         4      0.16   33.88   \n",
+      "4999       Technology        Seek  605.37         4      0.44  276.32   \n",
+      "\n",
+      "            ShipMode  ShippingDate  \n",
+      "0       Second Class           NaN  \n",
+      "1     Standard Class           NaN  \n",
+      "2     Standard Class           NaN  \n",
+      "3           Same Day           NaN  \n",
+      "4           Same Day           NaN  \n",
+      "...              ...           ...  \n",
+      "4995  Standard Class           NaN  \n",
+      "4996     First Class           NaN  \n",
+      "4997    Second Class           NaN  \n",
+      "4998    Second Class           NaN  \n",
+      "4999    Second Class           NaN  \n",
+      "\n",
+      "[5000 rows x 14 columns]\n"
+     ]
+    }
+   ],
+   "source": [
+    "import pandas as pd\n",
+    "df = pd.read_excel(\"Cleaned_Sales_Data.xlsx\")\n",
+    "print(df)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "646bee9d-26a4-4884-bdcf-b273773b3adf",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "(5000, 14)\n",
+      "<class 'pandas.core.frame.DataFrame'>\n",
+      "RangeIndex: 5000 entries, 0 to 4999\n",
+      "Data columns (total 14 columns):\n",
+      " #   Column           Non-Null Count  Dtype         \n",
+      "---  ------           --------------  -----         \n",
+      " 0   OrderID          5000 non-null   object        \n",
+      " 1   OrderDate        5000 non-null   datetime64[ns]\n",
+      " 2   CustomerID       5000 non-null   object        \n",
+      " 3   CustomerName     5000 non-null   object        \n",
+      " 4   Region           5000 non-null   object        \n",
+      " 5   Segment          5000 non-null   object        \n",
+      " 6   ProductCategory  5000 non-null   object        \n",
+      " 7   ProductName      4991 non-null   object        \n",
+      " 8   Sales            5000 non-null   float64       \n",
+      " 9   Quantity         5000 non-null   int64         \n",
+      " 10  Discount         5000 non-null   float64       \n",
+      " 11  Profit           5000 non-null   float64       \n",
+      " 12  ShipMode         5000 non-null   object        \n",
+      " 13  ShippingDate     0 non-null      float64       \n",
+      "dtypes: datetime64[ns](1), float64(4), int64(1), object(8)\n",
+      "memory usage: 547.0+ KB\n",
+      "None\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(df.shape)\n",
+    "print(df.info())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "a0e60d90-b097-4e4f-a2b7-f098b9ee99ca",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "                 OrderDate        Sales     Quantity     Discount  \\\n",
+      "count                 5000  5000.000000  5000.000000  5000.000000   \n",
+      "mean   2028-11-04 12:00:00   506.895382     5.007200     0.249464   \n",
+      "min    2022-01-01 00:00:00    20.010000     1.000000     0.000000   \n",
+      "25%    2025-06-03 18:00:00   258.985000     3.000000     0.120000   \n",
+      "50%    2028-11-04 12:00:00   510.010000     5.000000     0.250000   \n",
+      "75%    2032-04-07 06:00:00   753.137500     7.000000     0.380000   \n",
+      "max    2035-09-09 00:00:00   999.720000     9.000000     0.500000   \n",
+      "std                    NaN   283.841016     2.588298     0.145834   \n",
+      "\n",
+      "            Profit  ShippingDate  \n",
+      "count  5000.000000           0.0  \n",
+      "mean    127.816866           NaN  \n",
+      "min     -49.910000           NaN  \n",
+      "25%      42.402500           NaN  \n",
+      "50%     129.470000           NaN  \n",
+      "75%     213.572500           NaN  \n",
+      "max     299.970000           NaN  \n",
+      "std     100.463624           NaN  \n"
+     ]
+    }
+   ],
+   "source": [
+    "print(df.describe())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 21,
+   "id": "2e779f6c-96e0-45c7-95a8-fb86061746d9",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Duplicates: 0\n",
+      "OrderID               0\n",
+      "OrderDate             0\n",
+      "CustomerID            0\n",
+      "CustomerName          0\n",
+      "Region                0\n",
+      "Segment               0\n",
+      "ProductCategory       0\n",
+      "ProductName           9\n",
+      "Sales                 0\n",
+      "Quantity              0\n",
+      "Discount              0\n",
+      "Profit                0\n",
+      "ShipMode              0\n",
+      "ShippingDate       5000\n",
+      "dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"Duplicates:\",df.duplicated().sum())\n",
+    "print(df.isnull().sum())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 24,
+   "id": "edc21a94-4154-4778-9dc6-87dc1593d19d",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['Furniture' 'Office Supplies' 'Technology']\n",
+      "['East' 'South' 'Central' 'West']\n",
+      "2022-01-01 00:00:00 2035-09-09 00:00:00\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(df['ProductCategory'].unique())\n",
+    "print(df['Region'].unique())\n",
+    "print(df['OrderDate'].min(),df['OrderDate'].max())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 28,
+   "id": "d5273f3b-2176-4024-903b-b323f1bb0c6a",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>OrderID</th>\n",
+       "      <th>OrderDate</th>\n",
+       "      <th>CustomerID</th>\n",
+       "      <th>CustomerName</th>\n",
+       "      <th>Region</th>\n",
+       "      <th>Segment</th>\n",
+       "      <th>ProductCategory</th>\n",
+       "      <th>ProductName</th>\n",
+       "      <th>Sales</th>\n",
+       "      <th>Quantity</th>\n",
+       "      <th>Discount</th>\n",
+       "      <th>Profit</th>\n",
+       "      <th>ShipMode</th>\n",
+       "      <th>ShippingDate</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>ORD1000</td>\n",
+       "      <td>2022-01-01</td>\n",
+       "      <td>CUST802</td>\n",
+       "      <td>Adam Austin</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Corporate</td>\n",
+       "      <td>Furniture</td>\n",
+       "      <td>Old</td>\n",
+       "      <td>387.05</td>\n",
+       "      <td>3</td>\n",
+       "      <td>0.02</td>\n",
+       "      <td>211.19</td>\n",
+       "      <td>Second Class</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>ORD1001</td>\n",
+       "      <td>2022-01-02</td>\n",
+       "      <td>CUST905</td>\n",
+       "      <td>Jeremy Crane</td>\n",
+       "      <td>South</td>\n",
+       "      <td>Home Office</td>\n",
+       "      <td>Office Supplies</td>\n",
+       "      <td>Education</td>\n",
+       "      <td>951.70</td>\n",
+       "      <td>8</td>\n",
+       "      <td>0.17</td>\n",
+       "      <td>26.66</td>\n",
+       "      <td>Standard Class</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>ORD1002</td>\n",
+       "      <td>2022-01-03</td>\n",
+       "      <td>CUST960</td>\n",
+       "      <td>Robert Friedman</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Consumer</td>\n",
+       "      <td>Office Supplies</td>\n",
+       "      <td>Forget</td>\n",
+       "      <td>737.35</td>\n",
+       "      <td>7</td>\n",
+       "      <td>0.09</td>\n",
+       "      <td>-24.84</td>\n",
+       "      <td>Standard Class</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>ORD1003</td>\n",
+       "      <td>2022-01-04</td>\n",
+       "      <td>CUST558</td>\n",
+       "      <td>Julia Stewart</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Corporate</td>\n",
+       "      <td>Technology</td>\n",
+       "      <td>Themselves</td>\n",
+       "      <td>606.69</td>\n",
+       "      <td>3</td>\n",
+       "      <td>0.32</td>\n",
+       "      <td>200.49</td>\n",
+       "      <td>Same Day</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>ORD1004</td>\n",
+       "      <td>2022-01-05</td>\n",
+       "      <td>CUST642</td>\n",
+       "      <td>Brian Butler</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Home Office</td>\n",
+       "      <td>Office Supplies</td>\n",
+       "      <td>Break</td>\n",
+       "      <td>172.90</td>\n",
+       "      <td>6</td>\n",
+       "      <td>0.23</td>\n",
+       "      <td>86.75</td>\n",
+       "      <td>Same Day</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>5</th>\n",
+       "      <td>ORD1005</td>\n",
+       "      <td>2022-01-06</td>\n",
+       "      <td>CUST550</td>\n",
+       "      <td>Daniel Berg</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Corporate</td>\n",
+       "      <td>Furniture</td>\n",
+       "      <td>Late</td>\n",
+       "      <td>172.87</td>\n",
+       "      <td>4</td>\n",
+       "      <td>0.25</td>\n",
+       "      <td>218.13</td>\n",
+       "      <td>Second Class</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>6</th>\n",
+       "      <td>ORD1006</td>\n",
+       "      <td>2022-01-07</td>\n",
+       "      <td>CUST401</td>\n",
+       "      <td>Mark Berry</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Consumer</td>\n",
+       "      <td>Office Supplies</td>\n",
+       "      <td>What</td>\n",
+       "      <td>76.92</td>\n",
+       "      <td>5</td>\n",
+       "      <td>0.21</td>\n",
+       "      <td>105.85</td>\n",
+       "      <td>Standard Class</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>7</th>\n",
+       "      <td>ORD1007</td>\n",
+       "      <td>2022-01-08</td>\n",
+       "      <td>CUST434</td>\n",
+       "      <td>Scott Woodward</td>\n",
+       "      <td>Central</td>\n",
+       "      <td>Home Office</td>\n",
+       "      <td>Furniture</td>\n",
+       "      <td>Continue</td>\n",
+       "      <td>868.85</td>\n",
+       "      <td>5</td>\n",
+       "      <td>0.48</td>\n",
+       "      <td>71.10</td>\n",
+       "      <td>Same Day</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>8</th>\n",
+       "      <td>ORD1008</td>\n",
+       "      <td>2022-01-09</td>\n",
+       "      <td>CUST203</td>\n",
+       "      <td>Sandy Lewis</td>\n",
+       "      <td>Central</td>\n",
+       "      <td>Consumer</td>\n",
+       "      <td>Furniture</td>\n",
+       "      <td>Human</td>\n",
+       "      <td>609.09</td>\n",
+       "      <td>7</td>\n",
+       "      <td>0.11</td>\n",
+       "      <td>107.92</td>\n",
+       "      <td>Standard Class</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>9</th>\n",
+       "      <td>ORD1009</td>\n",
+       "      <td>2022-01-10</td>\n",
+       "      <td>CUST825</td>\n",
+       "      <td>Logan Sullivan</td>\n",
+       "      <td>East</td>\n",
+       "      <td>Home Office</td>\n",
+       "      <td>Furniture</td>\n",
+       "      <td>Instead</td>\n",
+       "      <td>713.91</td>\n",
+       "      <td>5</td>\n",
+       "      <td>0.26</td>\n",
+       "      <td>212.00</td>\n",
+       "      <td>Same Day</td>\n",
+       "      <td>NaN</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "   OrderID  OrderDate CustomerID     CustomerName   Region      Segment  \\\n",
+       "0  ORD1000 2022-01-01    CUST802      Adam Austin     East    Corporate   \n",
+       "1  ORD1001 2022-01-02    CUST905     Jeremy Crane    South  Home Office   \n",
+       "2  ORD1002 2022-01-03    CUST960  Robert Friedman     East     Consumer   \n",
+       "3  ORD1003 2022-01-04    CUST558    Julia Stewart     East    Corporate   \n",
+       "4  ORD1004 2022-01-05    CUST642     Brian Butler     East  Home Office   \n",
+       "5  ORD1005 2022-01-06    CUST550      Daniel Berg     East    Corporate   \n",
+       "6  ORD1006 2022-01-07    CUST401       Mark Berry     East     Consumer   \n",
+       "7  ORD1007 2022-01-08    CUST434   Scott Woodward  Central  Home Office   \n",
+       "8  ORD1008 2022-01-09    CUST203      Sandy Lewis  Central     Consumer   \n",
+       "9  ORD1009 2022-01-10    CUST825   Logan Sullivan     East  Home Office   \n",
+       "\n",
+       "   ProductCategory ProductName   Sales  Quantity  Discount  Profit  \\\n",
+       "0        Furniture         Old  387.05         3      0.02  211.19   \n",
+       "1  Office Supplies   Education  951.70         8      0.17   26.66   \n",
+       "2  Office Supplies      Forget  737.35         7      0.09  -24.84   \n",
+       "3       Technology  Themselves  606.69         3      0.32  200.49   \n",
+       "4  Office Supplies       Break  172.90         6      0.23   86.75   \n",
+       "5        Furniture        Late  172.87         4      0.25  218.13   \n",
+       "6  Office Supplies        What   76.92         5      0.21  105.85   \n",
+       "7        Furniture    Continue  868.85         5      0.48   71.10   \n",
+       "8        Furniture       Human  609.09         7      0.11  107.92   \n",
+       "9        Furniture     Instead  713.91         5      0.26  212.00   \n",
+       "\n",
+       "         ShipMode  ShippingDate  \n",
+       "0    Second Class           NaN  \n",
+       "1  Standard Class           NaN  \n",
+       "2  Standard Class           NaN  \n",
+       "3        Same Day           NaN  \n",
+       "4        Same Day           NaN  \n",
+       "5    Second Class           NaN  \n",
+       "6  Standard Class           NaN  \n",
+       "7        Same Day           NaN  \n",
+       "8  Standard Class           NaN  \n",
+       "9        Same Day           NaN  "
+      ]
+     },
+     "execution_count": 28,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df = df.dropna(subset = ['ProductName'])\n",
+    "df[df['ShippingDate'].isnull()].head(10)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 37,
+   "id": "3e2c2951-1b7e-4039-b2e0-006b50433586",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Index(['OrderID', 'OrderDate', 'CustomerID', 'CustomerName', 'Region',\n",
+      "       'Segment', 'ProductCategory', 'ProductName', 'Sales', 'Quantity',\n",
+      "       'Discount', 'Profit', 'ShipMode'],\n",
+      "      dtype='object')\n"
+     ]
+    }
+   ],
+   "source": [
+    "df.drop(\"ShippingDate\",axis = 1,inplace = True,errors = 'ignore')\n",
+    "print(df.columns)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 38,
+   "id": "a1c7b5d4-2f5a-4c2a-82b0-fe4437f87eec",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "OrderID            0\n",
+      "OrderDate          0\n",
+      "CustomerID         0\n",
+      "CustomerName       0\n",
+      "Region             0\n",
+      "Segment            0\n",
+      "ProductCategory    0\n",
+      "ProductName        0\n",
+      "Sales              0\n",
+      "Quantity           0\n",
+      "Discount           0\n",
+      "Profit             0\n",
+      "ShipMode           0\n",
+      "dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(df.isnull().sum())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 39,
+   "id": "fc7d79ab-ba74-4825-b1ed-b5bceb93a906",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "OrderID                    object\n",
+      "OrderDate          datetime64[ns]\n",
+      "CustomerID                 object\n",
+      "CustomerName               object\n",
+      "Region                     object\n",
+      "Segment                    object\n",
+      "ProductCategory            object\n",
+      "ProductName                object\n",
+      "Sales                     float64\n",
+      "Quantity                    int64\n",
+      "Discount                  float64\n",
+      "Profit                    float64\n",
+      "ShipMode                   object\n",
+      "dtype: object\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(df.dtypes)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 40,
+   "id": "07109863-aacd-4dab-92ea-649757e540b8",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "<bound method NDFrame.describe of       OrderID  OrderDate CustomerID     CustomerName   Region      Segment  \\\n",
+      "0     ORD1000 2022-01-01    CUST802      Adam Austin     East    Corporate   \n",
+      "1     ORD1001 2022-01-02    CUST905     Jeremy Crane    South  Home Office   \n",
+      "2     ORD1002 2022-01-03    CUST960  Robert Friedman     East     Consumer   \n",
+      "3     ORD1003 2022-01-04    CUST558    Julia Stewart     East    Corporate   \n",
+      "4     ORD1004 2022-01-05    CUST642     Brian Butler     East  Home Office   \n",
+      "...       ...        ...        ...              ...      ...          ...   \n",
+      "4995  ORD5995 2035-09-05    CUST276     Steven Perry    South     Consumer   \n",
+      "4996  ORD5996 2035-09-06    CUST524      Robin Smith  Central  Home Office   \n",
+      "4997  ORD5997 2035-09-07    CUST400    Amy Hernandez     East    Corporate   \n",
+      "4998  ORD5998 2035-09-08    CUST872      Anita Smith    South  Home Office   \n",
+      "4999  ORD5999 2035-09-09    CUST669  Angela Gonzalez     East    Corporate   \n",
+      "\n",
+      "      ProductCategory ProductName   Sales  Quantity  Discount  Profit  \\\n",
+      "0           Furniture         Old  387.05         3      0.02  211.19   \n",
+      "1     Office Supplies   Education  951.70         8      0.17   26.66   \n",
+      "2     Office Supplies      Forget  737.35         7      0.09  -24.84   \n",
+      "3          Technology  Themselves  606.69         3      0.32  200.49   \n",
+      "4     Office Supplies       Break  172.90         6      0.23   86.75   \n",
+      "...               ...         ...     ...       ...       ...     ...   \n",
+      "4995        Furniture     Article  899.45         4      0.02  290.15   \n",
+      "4996       Technology        Safe  136.99         5      0.42   12.57   \n",
+      "4997  Office Supplies    Probably  341.29         8      0.10  128.92   \n",
+      "4998        Furniture     Imagine  819.43         4      0.16   33.88   \n",
+      "4999       Technology        Seek  605.37         4      0.44  276.32   \n",
+      "\n",
+      "            ShipMode  \n",
+      "0       Second Class  \n",
+      "1     Standard Class  \n",
+      "2     Standard Class  \n",
+      "3           Same Day  \n",
+      "4           Same Day  \n",
+      "...              ...  \n",
+      "4995  Standard Class  \n",
+      "4996     First Class  \n",
+      "4997    Second Class  \n",
+      "4998    Second Class  \n",
+      "4999    Second Class  \n",
+      "\n",
+      "[4991 rows x 13 columns]>\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(df.describe)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 44,
+   "id": "71a0e415-9aca-4311-8e04-638f6d744682",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Region\n",
+      "East       1282\n",
+      "Central    1250\n",
+      "South      1232\n",
+      "West       1227\n",
+      "Name: count, dtype: int64\n",
+      "Segment\n",
+      "Corporate      1719\n",
+      "Home Office    1675\n",
+      "Consumer       1597\n",
+      "Name: count, dtype: int64\n",
+      "ProductCategory\n",
+      "Furniture          1684\n",
+      "Technology         1667\n",
+      "Office Supplies    1640\n",
+      "Name: count, dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "#CHeck the value counts for categorical columns:\n",
+    "print(df['Region'].value_counts())\n",
+    "print(df['Segment'].value_counts())\n",
+    "print(df['ProductCategory'].value_counts())"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 46,
+   "id": "68d1a880-afe0-4016-8b28-fee1a30c9066",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "ProductName\n",
+      "Center      14\n",
+      "After       13\n",
+      "Open        12\n",
+      "Many        12\n",
+      "Call        12\n",
+      "Ahead       12\n",
+      "Congress    12\n",
+      "Every       12\n",
+      "Deep        12\n",
+      "Yet         11\n",
+      "Name: count, dtype: int64\n"
+     ]
+    }
+   ],
+   "source": [
+    "#Find top Products\n",
+    "print(df['ProductName'].value_counts().head(10))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 49,
+   "id": "dab4b5f2-e687-4295-a9d0-41a1cbc6a123",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Region\n",
+      "East       653016.57\n",
+      "South      636300.53\n",
+      "Central    634224.14\n",
+      "West       606150.56\n",
+      "Name: Sales, dtype: float64\n",
+      "Segment\n",
+      "Consumer       0.249969\n",
+      "Corporate      0.249965\n",
+      "Home Office    0.248585\n",
+      "Name: Discount, dtype: float64\n",
+      "ProductCategory\n",
+      "Furniture          220570.55\n",
+      "Technology         215356.31\n",
+      "Office Supplies    202492.21\n",
+      "Name: Profit, dtype: float64\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(df.groupby('Region')['Sales'].sum().sort_values(ascending = False))\n",
+    "print(df.groupby('Segment')['Discount'].mean())\n",
+    "print(df.groupby('ProductCategory')['Profit'].sum().sort_values(ascending = False))"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 51,
+   "id": "322b31e0-04da-47ea-8f7a-7fd7f890115a",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Assuming your DataFrame is named df\n",
+    "df.to_csv(\"Cleaned_Sales_Data_by_python.csv\", index=False)\n"
+   ]
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.13.5"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
